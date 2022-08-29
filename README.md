@@ -16,6 +16,7 @@ Use the inlcuded CMakeLists.txt to generate makefile and then use make
 
 Commands:
 git clone https://github.com/NatanEspino/Raycaster.git  
+cd Raycaster  
 cmake -S . -B build  
 cd build  
 make  

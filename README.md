@@ -16,6 +16,7 @@ This project uses the OpenGL 3.3 core profile so make sure you install a glad ap
 Use the inlcuded CMakeLists.txt to generate makefile and then use make
 
 Commands:
+git clone 
 cmake -S . -B build
 cd build
 make

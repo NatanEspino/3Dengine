@@ -16,7 +16,7 @@ This project uses the OpenGL 3.3 core profile so make sure you install a glad ap
 Use the inlcuded CMakeLists.txt to generate makefile and then use make
 
 Commands:
-git clone 
-cmake -S . -B build
-cd build
+git clone https://github.com/NatanEspino/Raycaster.git\n
+cmake -S . -B build\n
+cd build\n
 make

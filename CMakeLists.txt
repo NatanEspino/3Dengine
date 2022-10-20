@@ -4,7 +4,7 @@ project(Raycaster)
 
 find_package(glfw3 REQUIRED)
 
-add_executable(${PROJECT_NAME} glad.c main.c)
+add_executable(${PROJECT_NAME} glad.c linearAlg.c main.c)
 
 target_link_libraries(${PROJECT_NAME} glfw)
 

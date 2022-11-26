@@ -16,7 +16,7 @@ Use the inlcuded CMakeLists.txt to generate makefile and then use make
 
 Commands:  
 git clone https://github.com/NatanEspino/3Dengine.git  
-/ncd 3Dengine  
+cd 3Dengine  
 cmake -S src -B bin  
 cd bin  
 make

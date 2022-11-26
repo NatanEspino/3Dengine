@@ -15,8 +15,8 @@ This project uses the OpenGL 3.3 core profile so make sure you install a glad ap
 Use the inlcuded CMakeLists.txt to generate makefile and then use make
 
 Commands:  
-git clone https://github.com/NatanEspino/3Dengine.git 
-/ncd 3Dengine
-cmake -S src -B bin
-cd bin
+git clone https://github.com/NatanEspino/3Dengine.git  
+/ncd 3Dengine  
+cmake -S src -B bin  
+cd bin  
 make

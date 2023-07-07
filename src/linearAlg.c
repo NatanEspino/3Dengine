@@ -3,7 +3,25 @@
 #include <math.h>
 #include <stdio.h>
 
+vec3 normalize(vec3 v){
+	float norm = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	vec3 unit = {{ v.x / norm, v.y / norm, v.z / norm }};
+	return unit;
+}
 
+vec3 addVec(vec3 u, vec3 v){
+	vec3 out = {{ u.x + v.x, u.y + v.y, u.z + v.z }};
+	return out;
+}
+
+vec3 scaleVec(vec3 v, float scalar){
+	vec3 out = {{v.x * scalar, v.y * scalar, v.z * scalar}};
+	return out;
+}
+vec3 crossProduct(vec3 u, vec3 v){
+	vec3 norm = {{u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x}};
+	return norm;
+}
 
 mat4 multMat4(const mat4 *a, const mat4 *b){
     mat4 out;
@@ -17,11 +35,6 @@ mat4 multMat4(const mat4 *a, const mat4 *b){
         }
     return out;
     
-}
-
-vec3 addVec(vec3 u, vec3 v){
-	vec3 out = {{ u.x + v.x, u.y + v.y, u.z + v.z }};
-	return out;
 }
 
 mat4 ortho(float left, float right, float bottom, float top, float near, float far){
@@ -46,15 +59,22 @@ mat4 perspective(float fovy, float aspectRatio, float near, float far){
     return out;
 }
 
-/*mat4 lookAt(vec3 pos, vec3 target, vec3 up){
-	
-}*/
-
-vec3 normalize(vec3 v){
-	float norm = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-	vec3 unit = {{ v.x / norm, v.y / norm, v.z / norm }};
-	return unit;
+mat4 lookAt(vec3 pos, vec3 target, vec3 up){
+	vec3 direction = normalize(addVec(pos, scaleVec(target, -1.0f)));
+	vec3 right = crossProduct(up, direction);
+	printVec3(direction);
+	printVec3(right);
+	printVec3(up);
+	mat4 out = {{
+		right.x, right.y, right.z, -(right.x * pos.x + right.y * pos.y + right.z * pos.z),
+		up.x, up.y, up.z, -(up.x * pos.x + up.y * pos.y + up.z * pos.z),
+		direction.x, direction.y, direction.z, -(direction.x * pos.x + direction.y * pos.y + direction.z * pos.z),
+		0.0f, 0.0f, 0.0f, 1.0f
+	}};
+	return out;
 }
+
+
 
 
 void rotateMat4X(mat4 *mat, float angle){
@@ -105,11 +125,11 @@ void rotateMat4Axis(mat4 *mat, vec3 axis, float angle){
 	
 }
 
-void translate(mat4 *mat, float x, float y, float z){
+void translate(mat4 *mat, vec3 displacement){
     mat4 translation = IDENTITY_MATRIX;
-    translation.m[3] = x;
-    translation.m[7] = y;
-    translation.m[11] = z;
+    translation.m[3] = displacement.x;
+    translation.m[7] = displacement.y;
+    translation.m[11] = displacement.z;
     (*mat) = multMat4(&translation, mat);
 }
 
@@ -121,6 +141,9 @@ void scale(mat4 *mat, float x, float y, float z){
     (*mat) = multMat4(&scaling, mat);
 }
 
+void printVec3(vec3 v) {
+	printf("(%f, %f, %f)\n", v.x, v.y, v.z);
+}
 
 void printMat4(mat4 *mat){
     for (int i=0; i< 16; i++){

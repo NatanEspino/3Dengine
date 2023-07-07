@@ -245,16 +245,19 @@ int main(){
     glUseProgram(shaderProgram);
     glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
     glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1);
-
-
+	
 	vec3 v = {{1.0f, 0.3f, 0.5f}};
 
     mat4 model = IDENTITY_MATRIX;
     unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_TRUE, (const GLfloat *)&model.m);
     
-    mat4 view = IDENTITY_MATRIX;
-	translate(&view, 0.0f, 0.0f, -3.0f);
+	float radius = 10.0f;
+	float time = glfwGetTime();
+	vec3 cameraPosition = {{radius * cosf(time), 0.0f, radius * sinf(time)}};
+	vec3 cameraTarget = {{0.0f, 0.0f, 0.0f}};
+    mat4 view = lookAt(cameraPosition, cameraTarget, jHat);
+	
     unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_TRUE, (const GLfloat *)&view.m);
     
@@ -272,16 +275,22 @@ int main(){
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        float time = glfwGetTime();
+        time = glfwGetTime();
 		
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
+		
+		cameraPosition.x = radius * sinf(time);
+		cameraPosition.z = radius * cosf(time);
+		
+		view = lookAt(cameraPosition, cameraTarget, jHat);
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, (const GLfloat *)&view.m);
 		
 		for(unsigned int i = 0; i < 10; i++){
 			model = IDENTITY_MATRIX;
 			float angle = (PI/9) * i;
 			rotateMat4Axis(&model, v, angle);
-			translate(&model, cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
+			translate(&model, cubePositions[i]);
 			glUniformMatrix4fv(modelLoc, 1, GL_TRUE, (const GLfloat *)&model.m);
 			
 			glDrawArrays(GL_TRIANGLES, 0, 36);

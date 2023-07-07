@@ -3,17 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vec4 multMatVec4(const mat4 *mat, const vec4 *vec){
-    vec4 out;
-    for (int i = 0; i < 4; i++){
-        out.m[i] = 
-        mat->m[i*4+0] * vec->x +
-        mat->m[i*4+1] * vec->y +
-        mat->m[i*4+2] * vec->z +
-        mat->m[i*4+3] * vec->w;
-    }
-    return out;
-}
+
 
 mat4 multMat4(const mat4 *a, const mat4 *b){
     mat4 out;
@@ -27,6 +17,11 @@ mat4 multMat4(const mat4 *a, const mat4 *b){
         }
     return out;
     
+}
+
+vec3 addVec(vec3 u, vec3 v){
+	vec3 out = {{ u.x + v.x, u.y + v.y, u.z + v.z }};
+	return out;
 }
 
 mat4 ortho(float left, float right, float bottom, float top, float near, float far){
@@ -50,6 +45,17 @@ mat4 perspective(float fovy, float aspectRatio, float near, float far){
     out.m[14] = -1;
     return out;
 }
+
+/*mat4 lookAt(vec3 pos, vec3 target, vec3 up){
+	
+}*/
+
+vec3 normalize(vec3 v){
+	float norm = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	vec3 unit = {{ v.x / norm, v.y / norm, v.z / norm }};
+	return unit;
+}
+
 
 void rotateMat4X(mat4 *mat, float angle){
     mat4 rotate = IDENTITY_MATRIX;
@@ -84,7 +90,20 @@ void rotateMat4Z(mat4 *mat, float angle){
     (*mat) = multMat4(&rotate, mat);
 }
 
-
+void rotateMat4Axis(mat4 *mat, vec3 axis, float angle){
+	vec3 u = normalize(axis);
+	float cosine = cosf(angle);
+	float sine = sinf(angle);
+	float diff = 1.0f - cosine;
+	mat4 rotate = {{
+		cosine + u.x * u.x * diff, u.x * u.y * diff - u.z * sine, u.x * u.z * diff + u.y * sine, 0.0f,
+		u.y * u.x * diff + u.z * sine, cosine + u.y * u.y * diff, u.y * u.z * diff - u.x * sine, 0.0f,
+		u.z * u.x * diff - u.y * sine, u.z * u.y * diff + u.x * sine, cosine + u.z * u.z * diff, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	}};
+	(*mat) = multMat4(&rotate, mat);
+	
+}
 
 void translate(mat4 *mat, float x, float y, float z){
     mat4 translation = IDENTITY_MATRIX;
@@ -101,6 +120,7 @@ void scale(mat4 *mat, float x, float y, float z){
     scaling.m[10] = z;
     (*mat) = multMat4(&scaling, mat);
 }
+
 
 void printMat4(mat4 *mat){
     for (int i=0; i< 16; i++){

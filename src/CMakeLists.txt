@@ -10,5 +10,9 @@ add_executable(${PROJECT_NAME} glad.c linearAlg.c main.c ${PARENT_DIR}/include/g
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PARENT_DIR}/include)
 
-target_link_libraries(${PROJECT_NAME} glfw dl m)
+target_compile_options(${PROJECT_NAME} PRIVATE
+  -Wall -Wextra -Wpedantic
+)
+
+target_link_libraries(${PROJECT_NAME} glfw)
 

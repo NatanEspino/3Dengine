@@ -72,7 +72,8 @@ int main(){
     
     // Create GLFW window
     const unsigned int SCR_WIDTH = 800;
-    const unsigned int SCR_HEIGHT = 800;
+    const unsigned int SCR_HEIGHT = 600;
+	const float aspectRatio = (float)SCR_WIDTH / (float)SCR_HEIGHT;
 
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     // Terminate window if it fails to initialize
@@ -91,7 +92,7 @@ int main(){
     glEnable(GL_DEPTH_TEST);
 
     // Specify OpenGL viewport
-    glViewport(0, 0, 800, 800);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     
     //Create vertex and fragment shaders
     GLuint vertexShader = loadShader("../shaders/vertexShader.vs", GL_VERTEX_SHADER);
@@ -117,52 +118,65 @@ int main(){
     // Cleanup
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-
+	
     // vertices
     float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+	
+	vec3 cubePositions[10] = {
+		{{ 0.0f, 0.0f,  0.0f}},
+		{{ 2.0f, 5.0f,-15.0f}},
+		{{-1.5f,-2.2f, -2.5f}},
+		{{-3.8f,-2.0f,-12.3f}},
+		{{ 2.4f,-0.4f, -3.5f}},
+		{{-1.7f, 3.0f, -7.5f}},
+		{{ 1.3f,-2.0f, -2.5f}},
+		{{ 1.5f, 2.0f, -2.5f}},
+		{{ 1.5f, 0.2f, -1.5f}},
+		{{-1.3f, 1.0f, -1.5f}}
+	};
+	
     //Create vertex array object, vertex and element buffer objects
     GLuint VAO, VBO;
     glGenVertexArrays(1, &VAO);
@@ -233,17 +247,20 @@ int main(){
     glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1);
 
 
+	vec3 v = {{1.0f, 0.3f, 0.5f}};
+
     mat4 model = IDENTITY_MATRIX;
     unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_TRUE, (const GLfloat *)&model.m);
     
     mat4 view = IDENTITY_MATRIX;
+	translate(&view, 0.0f, 0.0f, -3.0f);
     unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_TRUE, (const GLfloat *)&view.m);
     
-    mat4 projection = IDENTITY_MATRIX;
+    mat4 projection = perspective(PI / 4, aspectRatio, 0.1f, 100.0f);
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, (const GLfloat *)&projection);
+    glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, (const GLfloat *)&projection.m);
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -255,24 +272,20 @@ int main(){
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        model = IDENTITY_MATRIX;
         float time = glfwGetTime();
-        rotateMat4X(&model, time);
-        rotateMat4Y(&model, time);
-        glUniformMatrix4fv(modelLoc, 1, GL_TRUE, (const GLfloat *)&model.m);
-
-        view = IDENTITY_MATRIX;
-        translate(&view, 0.0f, 0.0f, -3.0f);
-        glUniformMatrix4fv(viewLoc, 1, GL_TRUE, (const GLfloat *)&view.m);
-
-        projection = IDENTITY_MATRIX;
-        projection = perspective(PI / 4, SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
-        glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, (const GLfloat *)&projection.m);
-         
+		
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        
+		
+		for(unsigned int i = 0; i < 10; i++){
+			model = IDENTITY_MATRIX;
+			float angle = (PI/9) * i;
+			rotateMat4Axis(&model, v, angle);
+			translate(&model, cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
+			glUniformMatrix4fv(modelLoc, 1, GL_TRUE, (const GLfloat *)&model.m);
+			
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}	
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

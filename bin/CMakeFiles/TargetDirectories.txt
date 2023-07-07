@@ -1,3 +1,0 @@
-C:/Users/Natan/Desktop/3Dengine/bin/CMakeFiles/3Dengine.dir
-C:/Users/Natan/Desktop/3Dengine/bin/CMakeFiles/edit_cache.dir
-C:/Users/Natan/Desktop/3Dengine/bin/CMakeFiles/rebuild_cache.dir

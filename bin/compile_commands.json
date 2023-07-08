@@ -1,0 +1,17 @@
+[
+{
+  "directory": "C:/Users/Natan/Desktop/3Dengine/bin",
+  "command": "C:\\msys64\\mingw64\\bin\\gcc.exe  @CMakeFiles/3Dengine.dir/includes_C.rsp -g -Wall -Wextra -Wpedantic -o CMakeFiles\\3Dengine.dir\\glad.c.obj -c C:\\Users\\Natan\\Desktop\\3Dengine\\src\\glad.c",
+  "file": "C:/Users/Natan/Desktop/3Dengine/src/glad.c"
+},
+{
+  "directory": "C:/Users/Natan/Desktop/3Dengine/bin",
+  "command": "C:\\msys64\\mingw64\\bin\\gcc.exe  @CMakeFiles/3Dengine.dir/includes_C.rsp -g -Wall -Wextra -Wpedantic -o CMakeFiles\\3Dengine.dir\\linearAlg.c.obj -c C:\\Users\\Natan\\Desktop\\3Dengine\\src\\linearAlg.c",
+  "file": "C:/Users/Natan/Desktop/3Dengine/src/linearAlg.c"
+},
+{
+  "directory": "C:/Users/Natan/Desktop/3Dengine/bin",
+  "command": "C:\\msys64\\mingw64\\bin\\gcc.exe  @CMakeFiles/3Dengine.dir/includes_C.rsp -g -Wall -Wextra -Wpedantic -o CMakeFiles\\3Dengine.dir\\main.c.obj -c C:\\Users\\Natan\\Desktop\\3Dengine\\src\\main.c",
+  "file": "C:/Users/Natan/Desktop/3Dengine/src/main.c"
+}
+]

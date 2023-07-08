@@ -62,9 +62,6 @@ mat4 perspective(float fovy, float aspectRatio, float near, float far){
 mat4 lookAt(vec3 pos, vec3 target, vec3 up){
 	vec3 direction = normalize(addVec(pos, scaleVec(target, -1.0f)));
 	vec3 right = crossProduct(up, direction);
-	printVec3(direction);
-	printVec3(right);
-	printVec3(up);
 	mat4 out = {{
 		right.x, right.y, right.z, -(right.x * pos.x + right.y * pos.y + right.z * pos.z),
 		up.x, up.y, up.z, -(up.x * pos.x + up.y * pos.y + up.z * pos.z),

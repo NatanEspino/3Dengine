@@ -7,66 +7,30 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+GLuint loadShader(const char* path, GLenum type);
+void handleInput(GLFWwindow* window);
+void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-GLuint loadShader(const char *path, GLenum type){
-    // read shader code from file path
-    FILE *f;
-    f = fopen(path, "r");
+GLboolean firstMouse = GL_TRUE;
+float lastX;
+float lastY;
+float mouseSensitivity;
 
-    int c;
-    char *shaderCode;
-    if (!f){
-        printf("Shader: Unable to open %s\n", path);
-        printf("Terminating...\n");
-    }
+float yaw = (float)(-PI / 2);
+float pitch = 0.0f;
+float cameraSpeed;
+float fov = (float)(PI / 4);
+float fps;
 
-    fseek(f, 0, SEEK_END);
-    long fsize = ftell(f);
-    rewind(f);
-    
-    if (!(shaderCode = malloc(fsize + 1))){
-        free(shaderCode);
-        printf("Shader memory allocation failed!");
-        return -1;
-    }
-
-    int i = 0;
-    while ((c = fgetc(f)) != EOF){
-        shaderCode[i] = (char)c;
-        i++;
-    }
-    shaderCode[i] = 0;
-    fclose(f);
-
-    // create and compile shader
-    GLuint Shader = glCreateShader(type);
-    glShaderSource(Shader, 1, (const GLchar**)&shaderCode, NULL);
-    glCompileShader(Shader);
-    free(shaderCode);
-    
-    // check for compilation errors
-    GLint success;
-    GLint maxLength = 512;
-    GLchar log[maxLength];
-
-    glGetShaderiv(Shader, GL_COMPILE_STATUS, &success);
-    if (success == GL_FALSE)
-    {
-        glGetShaderInfoLog(Shader, maxLength, NULL, log);
-        printf("SHADER COMPILATION FAILED: \n%s", log);
-        glDeleteShader(Shader);
-        return -1;
-    }
-
-    return Shader;
-}
-
-
+vec3 cameraFront;
+vec3 cameraUp;
+vec3 cameraRight;
+vec3 cameraPosition = {{0.0f, 0.0f, 3.0f}};
 
 int main(){
-    
     glfwInit();
-    
+
     // set OpenGL version and profile
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -84,9 +48,12 @@ int main(){
         glfwTerminate();
         return -1;
     }
-
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // add window to the current context
     glfwMakeContextCurrent(window);
+
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scroll_callback); 
 
     // initialize glad
     gladLoadGL();
@@ -251,22 +218,24 @@ int main(){
     // rotation axis
 	vec3 v = {{1.0f, 0.3f, 0.5f}};
 	
-
     mat4 model = IDENTITY_MATRIX;
     unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_TRUE, (const GLfloat *)&model.m);
+
+
     
-	vec3 cameraPosition = {{0.0f, 0.0f, 3.0f}};
-	vec3 cameraFront = {{0.0f, 0.0f, -1.0f}};
-    vec3 camerUp = {{0.0f, 1.0f, 0.0f}};
+    cameraFront.x = cosf(yaw) * cosf(pitch);
+    cameraFront.y = sinf(pitch);
+    cameraFront.z = sinf(yaw) * cosf(pitch); 
+    cameraUp = jHat;
 	
-    mat4 view = lookAt(cameraPosition, addVec(cameraPosition, cameraFront), jHat);
+    mat4 view = lookAt(cameraPosition, addVec(cameraPosition, cameraFront), cameraUp);
 	
     unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_TRUE, (const GLfloat *)&view.m);
     
-    mat4 projection = perspective(PI / 4, aspectRatio, 0.1f, 100.0f);
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+    mat4 projection = perspective(fov, aspectRatio, 0.1f, 100.0f);
     glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, (const GLfloat *)&projection.m);
     
     glActiveTexture(GL_TEXTURE0);
@@ -274,22 +243,39 @@ int main(){
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
+    // game variables
+    float currentFrame, deltaTime;
+    float lastFrame = 0.0f;
+    
     // main loop
     while (!glfwWindowShouldClose(window)){
+        
+        currentFrame = (float)glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        cameraSpeed = 2.5f * deltaTime;
+        mouseSensitivity = 25.0f * deltaTime;
+        cameraRight = crossProduct(cameraUp, cameraFront);
+      
+        handleInput(window);
+        
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        float time = glfwGetTime();
 		
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-		
-		view = lookAt(cameraPosition, addVec(cameraPosition, cameraFront), jHat);
+
+        
+        projection = perspective(fov, aspectRatio, 0.1f, 100.0f);
+        glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, (const GLfloat *)&projection.m);   
+
+		view = lookAt(cameraPosition, addVec(cameraPosition, cameraFront), cameraUp);
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, (const GLfloat *)&view.m);
 		
 		for(unsigned int i = 0; i < 10; i++){
 			model = IDENTITY_MATRIX;
-			float angle = (PI/9) * i;
+			float angle = (float)(PI/9) * i;
 			rotateMat4Axis(&model, v, angle);
 			translate(&model, cubePositions[i]);
 			glUniformMatrix4fv(modelLoc, 1, GL_TRUE, (const GLfloat *)&model.m);
@@ -299,7 +285,7 @@ int main(){
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    
+
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteTextures(1, &texture1);
@@ -310,3 +296,112 @@ int main(){
     return 0;
 }
 
+GLuint loadShader(const char *path, GLenum type){
+    // read shader code from file path
+    FILE *f;
+    f = fopen(path, "r");
+
+    int c;
+    char *shaderCode;
+    if (!f){
+        printf("Shader: Unable to open %s\n", path);
+        printf("Terminating...\n");
+    }
+
+    fseek(f, 0, SEEK_END);
+    long fsize = ftell(f);
+    rewind(f);
+    
+    if (!(shaderCode = malloc(fsize + 1))){
+        free(shaderCode);
+        printf("Shader memory allocation failed!");
+        return -1;
+    }
+
+    int i = 0;
+    while ((c = fgetc(f)) != EOF){
+        shaderCode[i] = (char)c;
+        i++;
+    }
+    shaderCode[i] = 0;
+    fclose(f);
+
+    // create and compile shader
+    GLuint Shader = glCreateShader(type);
+    glShaderSource(Shader, 1, (const GLchar**)&shaderCode, NULL);
+    glCompileShader(Shader);
+    free(shaderCode);
+    
+    // check for compilation errors
+    GLint success;
+    GLint maxLength = 512;
+    GLchar log[maxLength];
+
+    glGetShaderiv(Shader, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        glGetShaderInfoLog(Shader, maxLength, NULL, log);
+        printf("SHADER COMPILATION FAILED: \n%s", log);
+        glDeleteShader(Shader);
+        return -1;
+    }
+
+    return Shader;
+}
+
+void handleInput(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, GL_TRUE);
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            cameraPosition = addVec(cameraPosition, scaleVec(cameraFront, cameraSpeed));
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            cameraPosition = addVec(cameraPosition, scaleVec(cameraFront, -cameraSpeed));
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            cameraPosition = addVec(cameraPosition, scaleVec(cameraRight, cameraSpeed));
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            cameraPosition = addVec(cameraPosition, scaleVec(cameraRight, -cameraSpeed)); 
+}
+
+void mouseCallback(GLFWwindow* window, double xposIn, double yposIn){
+    float xpos = (float)xposIn;
+    float ypos = (float)yposIn;
+
+    if (firstMouse == GL_TRUE){
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = GL_FALSE;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    xoffset *= mouseSensitivity * cameraSpeed;
+    yoffset *= mouseSensitivity * cameraSpeed;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > (float)(PI / 2))
+        pitch = (float)(PI / 2);
+    if (pitch < (float)(-PI / 2))
+        pitch = (float)(-PI / 2);
+
+    cameraFront.x = cosf(yaw) * cosf(pitch);
+    cameraFront.y = sinf(pitch);
+    cameraFront.z = sinf(yaw) * cosf(pitch);
+
+    cameraUp.x = -cosf(yaw) * sinf(pitch);
+    cameraUp.y = cosf(pitch);
+    cameraUp.z = -sinf(yaw) * sinf(pitch);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+    fov -= (float)yoffset * (float)(PI / 180);
+    if (fov < (float)(PI / 180))
+        fov = (float)(PI / 180);
+    if (fov > (float)(PI / 4))
+        fov = (float)(PI / 4); 
+}
